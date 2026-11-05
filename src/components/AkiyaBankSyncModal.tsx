@@ -102,53 +102,53 @@ export const AkiyaBankSyncModal: React.FC<AkiyaBankSyncModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-3 sm:p-5 bg-stone-950/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white w-full max-w-3xl max-h-[92vh] rounded-2xl shadow-2xl border border-stone-200 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-2 sm:p-5 bg-stone-950/70 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white w-full max-w-3xl max-h-[95dvh] sm:max-h-[92vh] rounded-2xl shadow-2xl border border-stone-200 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-stone-900 text-white px-5 py-4 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-400 text-stone-950 flex items-center justify-center font-black shadow-md">
-              <Building2 className="w-5 h-5" />
+        <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-stone-900 text-white px-3.5 sm:px-5 py-3 sm:py-4 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-400 text-stone-950 flex items-center justify-center font-black shadow-md shrink-0">
+              <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="font-black text-base sm:text-lg tracking-tight">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <h3 className="font-black text-sm sm:text-lg tracking-tight truncate">
                   日南市公式 空き家バンク連携・データ同期
                 </h3>
-                <span className="bg-emerald-500/30 text-emerald-300 border border-emerald-400/50 text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="bg-emerald-500/30 text-emerald-300 border border-emerald-400/50 text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                   公式連携中
                 </span>
               </div>
-              <p className="text-xs text-stone-300">
-                日南市空き家・空き地情報バンク（やさしい移住・あったか宮崎ひなた暮らし）
+              <p className="text-[10px] sm:text-xs text-stone-300 truncate">
+                日南市空き家・空き地情報バンク（やさしい移住・ひなた暮らし）
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white flex items-center justify-center transition cursor-pointer shrink-0 ml-1"
             title="閉じる"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
+        <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-5">
           {/* Status & Sync Card */}
-          <div className="bg-gradient-to-br from-emerald-50 via-stone-50 to-amber-50 rounded-2xl p-4 sm:p-5 border border-emerald-200 shadow-2xs">
+          <div className="bg-gradient-to-br from-emerald-50 via-stone-50 to-amber-50 rounded-2xl p-3.5 sm:p-5 border border-emerald-200 shadow-2xs">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-emerald-200/80">
               <div>
-                <div className="flex items-center gap-2">
-                  <Database className="w-4 h-4 text-emerald-700" />
-                  <span className="text-xs font-black text-emerald-950">データ取得元</span>
+                <div className="flex items-center gap-1.5">
+                  <Database className="w-3.5 h-3.5 text-emerald-700" />
+                  <span className="text-[11px] sm:text-xs font-black text-emerald-950">データ取得元</span>
                 </div>
-                <div className="text-sm font-extrabold text-stone-900 mt-0.5">
+                <div className="text-xs sm:text-sm font-extrabold text-stone-900 mt-0.5 leading-snug">
                   日南市役所 総合政策課「空き家・空き地情報バンク」 / ポータル「やさしい移住」
                 </div>
-                <div className="text-xs text-stone-500 flex items-center gap-2 mt-1">
-                  <Clock className="w-3.5 h-3.5 text-stone-400" />
+                <div className="text-[10px] sm:text-xs text-stone-500 flex items-center gap-1.5 mt-1">
+                  <Clock className="w-3 h-3 text-stone-400" />
                   <span>最終同期: <strong className="text-stone-800">{lastSyncTime}</strong></span>
                 </div>
               </div>
@@ -157,18 +157,18 @@ export const AkiyaBankSyncModal: React.FC<AkiyaBankSyncModalProps> = ({
               <button
                 onClick={handleStartSync}
                 disabled={isSyncing}
-                className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 disabled:bg-stone-400 text-white font-black text-xs sm:text-sm rounded-xl shadow-xs transition flex items-center justify-center gap-2 cursor-pointer shrink-0"
+                className="w-full sm:w-auto px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 disabled:bg-stone-400 text-white font-black text-xs sm:text-sm rounded-xl shadow-xs transition flex items-center justify-center gap-2 cursor-pointer shrink-0 min-h-[40px] active:scale-98"
               >
-                <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isSyncing ? 'animate-spin' : ''}`} />
                 <span>{isSyncing ? 'データ引込中...' : '最新データを今すぐ引っ張る（再同期）'}</span>
               </button>
             </div>
 
             {/* Sync Progress & Success */}
             {isSyncing && (
-              <div className="mt-3 p-3 bg-white rounded-xl border border-emerald-300 shadow-2xs text-xs space-y-2 animate-in fade-in duration-200">
-                <div className="flex items-center gap-2 text-emerald-900 font-bold">
-                  <RefreshCw className="w-4 h-4 animate-spin text-emerald-600" />
+              <div className="mt-3 p-2.5 sm:p-3 bg-white rounded-xl border border-emerald-300 shadow-2xs text-xs space-y-2 animate-in fade-in duration-200">
+                <div className="flex items-center gap-2 text-emerald-900 font-bold text-[11px] sm:text-xs">
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-600" />
                   <span>{syncStep}</span>
                 </div>
                 <div className="w-full bg-stone-100 rounded-full h-1.5 overflow-hidden">
@@ -178,34 +178,34 @@ export const AkiyaBankSyncModal: React.FC<AkiyaBankSyncModalProps> = ({
             )}
 
             {syncSuccess && (
-              <div className="mt-3 p-3 bg-emerald-100/90 text-emerald-950 rounded-xl border border-emerald-300 shadow-2xs text-xs flex items-center justify-between gap-2 animate-in fade-in duration-200">
-                <div className="flex items-center gap-2 font-black">
+              <div className="mt-3 p-2.5 sm:p-3 bg-emerald-100/90 text-emerald-950 rounded-xl border border-emerald-300 shadow-2xs text-[11px] sm:text-xs flex items-center justify-between gap-2 animate-in fade-in duration-200">
+                <div className="flex items-center gap-1.5 sm:gap-2 font-black leading-snug">
                   <CheckCircle className="w-4 h-4 text-emerald-700 shrink-0" />
                   <span>日南市空き家バンクとの同期が完了しました！全{registeredCount}件の最新情報を反映中です。</span>
                 </div>
-                <span className="px-2 py-0.5 bg-emerald-700 text-white font-bold rounded-md text-[10px] shrink-0">
+                <span className="px-1.5 py-0.5 bg-emerald-700 text-white font-bold rounded-md text-[9px] sm:text-[10px] shrink-0">
                   最新
                 </span>
               </div>
             )}
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3">
-              <div className="bg-white/90 p-2.5 rounded-xl border border-stone-200">
-                <span className="text-[11px] font-bold text-stone-500 block">空き家バンク登録</span>
-                <span className="text-xl font-black text-emerald-900">{registeredCount} <span className="text-xs font-bold text-stone-600">件</span></span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 pt-3">
+              <div className="bg-white/90 p-2 sm:p-2.5 rounded-xl border border-stone-200">
+                <span className="text-[10px] sm:text-[11px] font-bold text-stone-500 block">空き家バンク登録</span>
+                <span className="text-lg sm:text-xl font-black text-emerald-900">{registeredCount} <span className="text-[10px] sm:text-xs font-bold text-stone-600">件</span></span>
               </div>
-              <div className="bg-white/90 p-2.5 rounded-xl border border-stone-200">
-                <span className="text-[11px] font-bold text-stone-500 block">売買物件</span>
-                <span className="text-xl font-black text-stone-900">{saleCount} <span className="text-xs font-bold text-stone-600">件</span></span>
+              <div className="bg-white/90 p-2 sm:p-2.5 rounded-xl border border-stone-200">
+                <span className="text-[10px] sm:text-[11px] font-bold text-stone-500 block">売買物件</span>
+                <span className="text-lg sm:text-xl font-black text-stone-900">{saleCount} <span className="text-[10px] sm:text-xs font-bold text-stone-600">件</span></span>
               </div>
-              <div className="bg-white/90 p-2.5 rounded-xl border border-stone-200">
-                <span className="text-[11px] font-bold text-stone-500 block">賃貸物件</span>
-                <span className="text-xl font-black text-stone-900">{rentalCount} <span className="text-xs font-bold text-stone-600">件</span></span>
+              <div className="bg-white/90 p-2 sm:p-2.5 rounded-xl border border-stone-200">
+                <span className="text-[10px] sm:text-[11px] font-bold text-stone-500 block">賃貸物件</span>
+                <span className="text-lg sm:text-xl font-black text-stone-900">{rentalCount} <span className="text-[10px] sm:text-xs font-bold text-stone-600">件</span></span>
               </div>
-              <div className="bg-white/90 p-2.5 rounded-xl border border-amber-300 bg-amber-50/60">
-                <span className="text-[11px] font-bold text-amber-900 block">0円無償譲渡</span>
-                <span className="text-xl font-black text-amber-900">{zeroYenCount} <span className="text-xs font-bold text-stone-600">件</span></span>
+              <div className="bg-white/90 p-2 sm:p-2.5 rounded-xl border border-amber-300 bg-amber-50/60">
+                <span className="text-[10px] sm:text-[11px] font-bold text-amber-900 block">0円無償譲渡</span>
+                <span className="text-lg sm:text-xl font-black text-amber-900">{zeroYenCount} <span className="text-[10px] sm:text-xs font-bold text-stone-600">件</span></span>
               </div>
             </div>
           </div>
@@ -230,13 +230,13 @@ export const AkiyaBankSyncModal: React.FC<AkiyaBankSyncModalProps> = ({
                   onChange={(e) => setImportQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearchAndImport(importQuery)}
                   placeholder="例: 第24-03号、南郷町、飫肥、0円"
-                  className="w-full px-3.5 py-2 pl-9 rounded-xl border border-stone-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  className="w-full px-3.5 py-2.5 pl-9 rounded-xl border border-stone-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 min-h-[40px]"
                 />
-                <Search className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
+                <Search className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
               </div>
               <button
                 onClick={() => handleSearchAndImport(importQuery)}
-                className="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                className="px-4 py-2.5 bg-stone-900 hover:bg-stone-800 active:bg-stone-950 text-white font-bold text-xs rounded-xl transition cursor-pointer min-h-[40px] shrink-0 active:scale-95"
               >
                 引っ張る
               </button>
@@ -244,7 +244,7 @@ export const AkiyaBankSyncModal: React.FC<AkiyaBankSyncModalProps> = ({
 
             {/* Quick Chips */}
             <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              <span className="text-[11px] font-bold text-stone-500">クイック選択:</span>
+              <span className="text-[10px] sm:text-[11px] font-bold text-stone-500">クイック選択:</span>
               {sampleQuickQueries.map(sample => (
                 <button
                   key={sample.query}
@@ -252,7 +252,7 @@ export const AkiyaBankSyncModal: React.FC<AkiyaBankSyncModalProps> = ({
                     setImportQuery(sample.query);
                     handleSearchAndImport(sample.query);
                   }}
-                  className="px-2.5 py-1 bg-stone-100 hover:bg-amber-100 text-stone-700 hover:text-stone-950 rounded-lg text-[11px] font-bold transition cursor-pointer border border-stone-200"
+                  className="px-2.5 py-1.5 bg-stone-100 hover:bg-amber-100 active:bg-amber-200 text-stone-700 hover:text-stone-950 rounded-lg text-[10px] sm:text-[11px] font-bold transition cursor-pointer border border-stone-200 active:scale-95 min-h-[32px]"
                 >
                   {sample.label}
                 </button>
@@ -261,9 +261,9 @@ export const AkiyaBankSyncModal: React.FC<AkiyaBankSyncModalProps> = ({
 
             {/* Import Result Preview */}
             {importResult && (
-              <div className="mt-3 p-3.5 bg-emerald-50/80 rounded-xl border border-emerald-300 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in duration-200">
-                <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-xl overflow-hidden bg-stone-100 border border-emerald-300 shrink-0">
+              <div className="mt-3 p-3 sm:p-3.5 bg-emerald-50/80 rounded-xl border border-emerald-300 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in duration-200">
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-stone-100 border border-emerald-300 shrink-0">
                     {importResult.images && importResult.images.length > 0 ? (
                       <img
                         src={importResult.images[0]}
@@ -273,26 +273,26 @@ export const AkiyaBankSyncModal: React.FC<AkiyaBankSyncModalProps> = ({
                       />
                     ) : (
                       <div className="w-full h-full bg-emerald-800 text-white flex items-center justify-center font-black">
-                        <FileCheck className="w-6 h-6 text-amber-300" />
+                        <FileCheck className="w-5 h-5 text-amber-300" />
                       </div>
                     )}
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="px-2 py-0.5 bg-emerald-800 text-white rounded text-[10px] font-black">
+                      <span className="px-1.5 py-0.2 bg-emerald-800 text-white rounded text-[10px] font-black shrink-0">
                         {importResult.registrationNumber || '日南市空き家バンク登録'}
                       </span>
-                      <span className="text-xs font-black text-amber-900 bg-amber-200 px-1.5 py-0.2 rounded">
+                      <span className="text-[10px] sm:text-xs font-black text-amber-900 bg-amber-200 px-1.5 py-0.2 rounded shrink-0">
                         {importResult.bankTransactionType || '売買'}
                       </span>
                     </div>
-                    <div className="font-extrabold text-stone-900 text-xs sm:text-sm mt-0.5">
+                    <div className="font-extrabold text-stone-900 text-xs sm:text-sm mt-0.5 truncate">
                       {importResult.title}
                     </div>
-                    <div className="text-[11px] text-stone-600 flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-stone-400" />
-                      <span>{importResult.address}</span>
-                      <strong className="text-stone-900 ml-1">
+                    <div className="text-[10px] sm:text-[11px] text-stone-600 flex items-center gap-1 truncate">
+                      <MapPin className="w-3 h-3 text-stone-400 shrink-0" />
+                      <span className="truncate">{importResult.address}</span>
+                      <strong className="text-stone-900 ml-1 shrink-0">
                         {importResult.price === 0 ? '0円譲渡' : `${(importResult.price / 10000).toLocaleString()}万円`}
                       </strong>
                     </div>
@@ -304,7 +304,7 @@ export const AkiyaBankSyncModal: React.FC<AkiyaBankSyncModalProps> = ({
                     onClose();
                     onSelectProperty(importResult);
                   }}
-                  className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1 cursor-pointer shrink-0"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-xs transition flex items-center justify-center gap-1 cursor-pointer shrink-0 min-h-[40px] active:scale-98"
                 >
                   <span>地図と詳細を見る</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -320,52 +320,52 @@ export const AkiyaBankSyncModal: React.FC<AkiyaBankSyncModalProps> = ({
           </div>
 
           {/* Official Nichinan Bank Policy & Benefits */}
-          <div className="bg-stone-50 rounded-2xl p-4 sm:p-5 border border-stone-200 space-y-3">
-            <h4 className="font-black text-stone-900 text-sm flex items-center gap-2">
+          <div className="bg-stone-50 rounded-2xl p-3.5 sm:p-5 border border-stone-200 space-y-3">
+            <h4 className="font-black text-stone-900 text-xs sm:text-sm flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-700" />
               <span>日南市空き家バンク 公式制度とメリット</span>
             </h4>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div className="bg-white p-3 rounded-xl border border-stone-200 space-y-1">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 text-xs">
+              <div className="bg-white p-2.5 sm:p-3 rounded-xl border border-stone-200 space-y-1">
                 <div className="font-black text-emerald-900 flex items-center gap-1.5">
                   <Coins className="w-3.5 h-3.5 text-amber-500" />
                   <span>家財処分支援補助金</span>
                 </div>
-                <div className="text-stone-800 font-extrabold">最大 10 万円補助</div>
-                <p className="text-[11px] text-stone-500 leading-snug">
+                <div className="text-stone-800 font-extrabold text-xs sm:text-sm">最大 10 万円補助</div>
+                <p className="text-[10px] sm:text-[11px] text-stone-500 leading-snug">
                   空き家バンク登録物件の家財道具・不用品の片付け費用（3分の2補助）
                 </p>
               </div>
 
-              <div className="bg-white p-3 rounded-xl border border-stone-200 space-y-1">
+              <div className="bg-white p-2.5 sm:p-3 rounded-xl border border-stone-200 space-y-1">
                 <div className="font-black text-emerald-900 flex items-center gap-1.5">
                   <Home className="w-3.5 h-3.5 text-amber-500" />
                   <span>空き家改修補助金</span>
                 </div>
-                <div className="text-stone-800 font-extrabold">最大 150 万円補助</div>
-                <p className="text-[11px] text-stone-500 leading-snug">
+                <div className="text-stone-800 font-extrabold text-xs sm:text-sm">最大 150 万円補助</div>
+                <p className="text-[10px] sm:text-[11px] text-stone-500 leading-snug">
                   水回りリフレッシュや外壁塗装など、居住に向けた改修工事を大幅支援
                 </p>
               </div>
 
-              <div className="bg-white p-3 rounded-xl border border-stone-200 space-y-1">
+              <div className="bg-white p-2.5 sm:p-3 rounded-xl border border-stone-200 space-y-1">
                 <div className="font-black text-emerald-900 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                   <span>移住者優先制度</span>
                 </div>
-                <div className="text-stone-800 font-extrabold">移住希望者優先</div>
-                <p className="text-[11px] text-stone-500 leading-snug">
+                <div className="text-stone-800 font-extrabold text-xs sm:text-sm">移住希望者優先</div>
+                <p className="text-[10px] sm:text-[11px] text-stone-500 leading-snug">
                   市外・県外からの移住希望者と重複した場合、移住者の希望を優先マッチング
                 </p>
               </div>
             </div>
 
             {/* Official Contact Desk Info */}
-            <div className="bg-white p-3 rounded-xl border border-stone-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="bg-white p-2.5 sm:p-3 rounded-xl border border-stone-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <div>
-                <span className="font-black text-stone-800 block">日南市 空き家相談窓口・コンシェルジュ</span>
-                <span className="text-[11px] text-stone-500">
+                <span className="font-black text-stone-800 block text-xs">日南市 空き家相談窓口・コンシェルジュ</span>
+                <span className="text-[10px] sm:text-[11px] text-stone-500 leading-snug block">
                   市外の方: 移住定住コンシェルジュ (090-8355-3900) / 市内の方: 空き家カウンセラー (090-9480-3456)
                 </span>
               </div>
@@ -374,7 +374,7 @@ export const AkiyaBankSyncModal: React.FC<AkiyaBankSyncModalProps> = ({
                   href="https://nichinan-iju.jp/akiya/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-xs rounded-lg transition flex items-center gap-1 border border-stone-300"
+                  className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-800 font-bold text-xs rounded-lg transition flex items-center gap-1 border border-stone-300 min-h-[34px]"
                 >
                   <span>公式サイト</span>
                   <ExternalLink className="w-3 h-3 text-stone-500" />
@@ -385,13 +385,13 @@ export const AkiyaBankSyncModal: React.FC<AkiyaBankSyncModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="bg-stone-50 px-5 py-3 border-t border-stone-200 flex items-center justify-between shrink-0">
-          <span className="text-[11px] text-stone-500 font-medium">
+        <div className="bg-stone-50 px-3.5 sm:px-5 py-2.5 sm:py-3 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-2 shrink-0">
+          <span className="text-[10px] sm:text-[11px] text-stone-500 font-medium text-center sm:text-left">
             ※空き家の内覧・契約には、日南市への利用登録申込（申請書・誓約書）が必要です。
           </span>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-stone-800 hover:bg-stone-900 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+            className="w-full sm:w-auto px-5 py-2 bg-stone-800 hover:bg-stone-900 active:bg-stone-950 text-white font-bold text-xs rounded-xl transition cursor-pointer min-h-[38px] active:scale-95"
           >
             閉じる
           </button>

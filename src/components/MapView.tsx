@@ -4,6 +4,9 @@ import {
   MapPin,
   Sparkles,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  SlidersHorizontal,
   Maximize2,
   Minimize2,
   Heart,
@@ -460,6 +463,34 @@ export const MapView: React.FC<MapViewProps> = ({
   const [showLandmarks, setShowLandmarks] = useState<boolean>(true);
   const [positionedProperties, setPositionedProperties] = useState<PositionedProperty[]>([]);
 
+  // Responsive: collapsible district selector to prevent taking excessive space on mobile
+  const [isDistrictCollapsed, setIsDistrictCollapsed] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('nichinan_district_collapsed');
+      if (saved !== null) return saved === 'true';
+      return window.innerWidth < 768; // Default to collapsed/compact on mobile
+    }
+    return false;
+  });
+
+  // Responsive: minimize all top controls to maximize map viewport on smartphone
+  const [isControlsMinimized, setIsControlsMinimized] = useState<boolean>(false);
+
+  // Invalidate Leaflet map size when controls collapse/expand or window resizes
+  useEffect(() => {
+    const handleResize = () => {
+      mapInstanceRef.current?.invalidateSize();
+    };
+    window.addEventListener('resize', handleResize);
+    const timer = setTimeout(() => {
+      mapInstanceRef.current?.invalidateSize();
+    }, 250);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timer);
+    };
+  }, [isDistrictCollapsed, isControlsMinimized]);
+
   // Calculate property count per district for immediate clarity
   const districtCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -883,209 +914,323 @@ export const MapView: React.FC<MapViewProps> = ({
   };
 
   return (
-    <div className="h-full w-full flex flex-col relative overflow-hidden bg-white rounded-2xl border border-stone-200 shadow-sm">
+    <div className="h-full w-full flex flex-col relative overflow-hidden bg-white rounded-none sm:rounded-2xl border-0 sm:border border-stone-200 shadow-none sm:shadow-sm">
       {/* Top Map Control Bar (Status & Layer Controls) */}
-      <div className="shrink-0 bg-white border-b border-stone-200 px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2 z-20">
-        {/* Current status / Reset button */}
-        <div className="flex items-center gap-2 text-xs font-bold">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-stone-100 rounded-lg text-stone-800 border border-stone-200">
-            <span className="text-sm">{DISTRICT_ICONS[selectedDistrictKey] || '🌴'}</span>
-            <span className="text-stone-500 font-medium">現在選択中:</span>
-            <span className="text-emerald-950 font-black">
-              {NICHINAN_DISTRICTS[selectedDistrictKey]?.shortName}
-            </span>
-            {selectedDistrictKey !== 'ALL' && (
-              <span className="text-[11px] font-black text-amber-800 bg-amber-200/80 px-1.5 py-0.2 rounded-full ml-1">
-                {displayedProperties.length}件
+      {!isControlsMinimized && (
+        <div className="shrink-0 bg-white border-b border-stone-200 px-2 sm:px-4 py-1 sm:py-2 flex flex-wrap items-center justify-between gap-1 sm:gap-2 z-20">
+          {/* Current status / Reset button */}
+          <div className="flex items-center gap-1 sm:gap-2 text-xs font-bold">
+            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 bg-stone-100 rounded-lg text-stone-800 border border-stone-200 min-h-[32px]">
+              <span className="text-sm">{DISTRICT_ICONS[selectedDistrictKey] || '🌴'}</span>
+              <span className="text-stone-500 font-medium hidden sm:inline">現在選択中:</span>
+              <span className="text-emerald-950 font-black">
+                {NICHINAN_DISTRICTS[selectedDistrictKey]?.shortName}
               </span>
+              {selectedDistrictKey !== 'ALL' && (
+                <span className="text-[10px] sm:text-[11px] font-black text-amber-800 bg-amber-200/80 px-1.5 py-0.2 rounded-full ml-0.5 sm:ml-1">
+                  {displayedProperties.length}件
+                </span>
+              )}
+            </div>
+
+            {selectedDistrictKey !== 'ALL' && (
+              <button
+                onClick={handleResetBounds}
+                className="px-2 sm:px-2.5 py-1 bg-stone-100 hover:bg-amber-50 active:bg-amber-100 text-stone-700 hover:text-stone-950 rounded-lg transition cursor-pointer border border-stone-200 flex items-center gap-1 text-[11px] sm:text-xs font-bold min-h-[32px]"
+                title="日南市全域表示に戻す"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span className="hidden sm:inline">全域に戻す</span>
+                <span className="sm:hidden">全域</span>
+              </button>
+            )}
+
+            {/* Landmarks Layer Toggle */}
+            {selectedDistrictKey !== 'ALL' && (
+              <button
+                onClick={() => setShowLandmarks(!showLandmarks)}
+                className={`px-1.5 sm:px-2 py-1 rounded-lg text-[11px] sm:text-xs font-bold transition cursor-pointer border flex items-center gap-1 min-h-[32px] ${
+                  showLandmarks
+                    ? 'bg-amber-50 text-amber-900 border-amber-300'
+                    : 'bg-stone-100 text-stone-500 border-stone-200 hover:bg-stone-200'
+                }`}
+                title="主要ランドマーク（名所・駅・市役所）表示切替"
+              >
+                <span>🏛️</span>
+                <span className="hidden sm:inline">名所</span>
+              </button>
+            )}
+
+            {/* Official Nichinan Akiya Bank Sync / Pull Button */}
+            {onOpenAkiyaBankSync && (
+              <button
+                onClick={onOpenAkiyaBankSync}
+                className="px-2 sm:px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-900 border border-emerald-300 rounded-lg text-[11px] sm:text-xs font-bold transition flex items-center gap-1 sm:gap-1.5 cursor-pointer shadow-2xs min-h-[32px]"
+                title="日南市公式空き家バンク連携・データ同期マネージャーを開く"
+              >
+                <span>🏛️</span>
+                <span className="hidden sm:inline">空き家バンク連携</span>
+                <span className="sm:hidden">連携</span>
+                <span className="text-[9px] sm:text-[10px] bg-emerald-700 text-white px-1 sm:px-1.5 py-0.2 rounded-full font-black">
+                  公式
+                </span>
+              </button>
             )}
           </div>
 
-          {selectedDistrictKey !== 'ALL' && (
-            <button
-              onClick={handleResetBounds}
-              className="px-2.5 py-1 bg-stone-100 hover:bg-amber-50 text-stone-700 hover:text-stone-950 rounded-lg transition cursor-pointer border border-stone-200 flex items-center gap-1 text-xs font-bold"
-              title="日南市全域表示に戻す"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span>全域に戻す</span>
-            </button>
-          )}
+          {/* Map Display & Layer Settings */}
+          <div className="flex items-center gap-1 sm:gap-2 text-xs font-bold text-stone-700">
+            {/* Badge Display Mode Switcher (Label / Price / Number) - only relevant when pins are displayed in a district */}
+            {selectedDistrictKey !== 'ALL' && (
+              <div className="bg-stone-100 p-0.5 rounded-lg flex items-center border border-stone-200 text-[11px] sm:text-xs min-h-[32px]">
+                <button
+                  onClick={() => setBadgeMode('label')}
+                  className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md transition cursor-pointer ${
+                    badgeMode === 'label' ? 'bg-emerald-800 text-white font-black shadow-xs' : 'hover:text-stone-950'
+                  }`}
+                  title="地区名ラベル表示"
+                >
+                  地区
+                </button>
+                <button
+                  onClick={() => setBadgeMode('price')}
+                  className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md transition cursor-pointer ${
+                    badgeMode === 'price' ? 'bg-emerald-800 text-white font-black shadow-xs' : 'hover:text-stone-950'
+                  }`}
+                  title="価格ラベル表示"
+                >
+                  価格
+                </button>
+                <button
+                  onClick={() => setBadgeMode('compact')}
+                  className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md transition cursor-pointer ${
+                    badgeMode === 'compact' ? 'bg-emerald-800 text-white font-black shadow-xs' : 'hover:text-stone-950'
+                  }`}
+                  title="番号ピン表示"
+                >
+                  番号
+                </button>
+              </div>
+            )}
 
-          {/* Landmarks Layer Toggle */}
-          {selectedDistrictKey !== 'ALL' && (
-            <button
-              onClick={() => setShowLandmarks(!showLandmarks)}
-              className={`px-2 py-1 rounded-lg text-xs font-bold transition cursor-pointer border flex items-center gap-1 ${
-                showLandmarks
-                  ? 'bg-amber-50 text-amber-900 border-amber-300'
-                  : 'bg-stone-100 text-stone-500 border-stone-200 hover:bg-stone-200'
-              }`}
-              title="主要ランドマーク（名所・駅・市役所）表示切替"
-            >
-              <span>🏛️</span>
-              <span className="hidden sm:inline">名所</span>
-            </button>
-          )}
-
-          {/* Official Nichinan Akiya Bank Sync / Pull Button */}
-          {onOpenAkiyaBankSync && (
-            <button
-              onClick={onOpenAkiyaBankSync}
-              className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
-              title="日南市公式空き家バンク連携・データ同期マネージャーを開く"
-            >
-              <span>🏛️</span>
-              <span>空き家バンク連携</span>
-              <span className="text-[10px] bg-emerald-700 text-white px-1.5 py-0.2 rounded-full font-black">
-                公式
-              </span>
-            </button>
-          )}
-        </div>
-
-        {/* Map Display & Layer Settings */}
-        <div className="flex items-center gap-2 text-xs font-bold text-stone-700">
-          {/* Badge Display Mode Switcher (Label / Price / Number) - only relevant when pins are displayed in a district */}
-          {selectedDistrictKey !== 'ALL' && (
-            <div className="bg-stone-100 p-0.5 rounded-lg flex items-center border border-stone-200">
+            {/* Map Layer Switcher: Real Satellite Hybrid / Aerial Photo / 3D Relief / City Map */}
+            <div className="flex bg-stone-100 p-0.5 rounded-lg items-center border border-stone-200 text-[11px] sm:text-xs min-h-[32px]">
               <button
-                onClick={() => setBadgeMode('label')}
-                className={`px-2 py-1 rounded-md transition cursor-pointer text-xs ${
-                  badgeMode === 'label' ? 'bg-emerald-800 text-white font-black shadow-xs' : 'hover:text-stone-950'
+                onClick={() => setCurrentTileKey('esri_hybrid')}
+                className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md transition cursor-pointer flex items-center gap-1 ${
+                  currentTileKey === 'esri_hybrid' ? 'bg-emerald-800 text-white font-black shadow-xs ring-1 ring-emerald-600' : 'text-stone-700 hover:text-stone-950 hover:bg-stone-200/60'
                 }`}
-                title="地区名ラベル表示"
+                title="リアル高精細衛星写真（道路・地名ハイブリッド）"
               >
-                地区名
+                <span>🛰️</span>
+                <span className="sm:hidden">衛星</span>
+                <span className="hidden sm:inline">リアル衛星</span>
               </button>
               <button
-                onClick={() => setBadgeMode('price')}
-                className={`px-2 py-1 rounded-md transition cursor-pointer text-xs ${
-                  badgeMode === 'price' ? 'bg-emerald-800 text-white font-black shadow-xs' : 'hover:text-stone-950'
+                onClick={() => setCurrentTileKey('gsi_photo')}
+                className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md transition cursor-pointer flex items-center gap-1 ${
+                  currentTileKey === 'gsi_photo' ? 'bg-emerald-800 text-white font-black shadow-xs ring-1 ring-emerald-600' : 'text-stone-700 hover:text-stone-950 hover:bg-stone-200/60'
                 }`}
-                title="価格ラベル表示"
+                title="国土地理院 リアル航空写真"
               >
-                価格
+                <span>📸</span>
+                <span className="sm:hidden">航空</span>
+                <span className="hidden sm:inline">航空写真</span>
               </button>
               <button
-                onClick={() => setBadgeMode('compact')}
-                className={`px-2 py-1 rounded-md transition cursor-pointer text-xs ${
-                  badgeMode === 'compact' ? 'bg-emerald-800 text-white font-black shadow-xs' : 'hover:text-stone-950'
+                onClick={() => setCurrentTileKey('gsi_relief')}
+                className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md transition cursor-pointer flex items-center gap-1 ${
+                  currentTileKey === 'gsi_relief' ? 'bg-amber-500 text-stone-950 font-black shadow-xs ring-1 ring-amber-400' : 'text-stone-700 hover:text-stone-950 hover:bg-stone-200/60'
                 }`}
-                title="番号ピン表示"
+                title="立体地形・色別標高リアルマップ"
               >
-                番号
+                <span>⛰️</span>
+                <span className="sm:hidden">地形</span>
+                <span className="hidden sm:inline">立体地形</span>
+              </button>
+              <button
+                onClick={() => setCurrentTileKey('gsi_std')}
+                className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md transition cursor-pointer flex items-center gap-1 ${
+                  currentTileKey === 'gsi_std' ? 'bg-stone-800 text-white font-black shadow-xs ring-1 ring-stone-700' : 'text-stone-700 hover:text-stone-950 hover:bg-stone-200/60'
+                }`}
+                title="国土地理院 標準市街地図"
+              >
+                <span>🗺️</span>
+                <span className="sm:hidden">地図</span>
+                <span className="hidden sm:inline">市街地図</span>
               </button>
             </div>
-          )}
 
-          {/* Map Layer Switcher: Real Satellite Hybrid / Aerial Photo / 3D Relief / City Map */}
-          <div className="flex bg-stone-100 p-0.5 rounded-lg items-center border border-stone-200 text-xs">
+            {/* Quick Map Maximize / Controls Minimize button for smartphone */}
             <button
-              onClick={() => setCurrentTileKey('esri_hybrid')}
-              className={`px-2.5 py-1 rounded-md transition cursor-pointer flex items-center gap-1.5 ${
-                currentTileKey === 'esri_hybrid' ? 'bg-emerald-800 text-white font-black shadow-xs ring-1 ring-emerald-600' : 'text-stone-700 hover:text-stone-950 hover:bg-stone-200/60'
-              }`}
-              title="リアル高精細衛星写真（道路・地名ハイブリッド）"
+              onClick={() => setIsControlsMinimized(true)}
+              className="p-1.5 rounded-lg border border-stone-200 bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-600 hover:text-stone-950 transition cursor-pointer shadow-2xs min-h-[32px] min-w-[32px] flex items-center justify-center"
+              title="コントロールを縮小して地図を全画面表示"
             >
-              <span>🛰️</span>
-              <span>リアル衛星</span>
-            </button>
-            <button
-              onClick={() => setCurrentTileKey('gsi_photo')}
-              className={`px-2.5 py-1 rounded-md transition cursor-pointer flex items-center gap-1.5 ${
-                currentTileKey === 'gsi_photo' ? 'bg-emerald-800 text-white font-black shadow-xs ring-1 ring-emerald-600' : 'text-stone-700 hover:text-stone-950 hover:bg-stone-200/60'
-              }`}
-              title="国土地理院 リアル航空写真"
-            >
-              <span>📸</span>
-              <span>航空写真</span>
-            </button>
-            <button
-              onClick={() => setCurrentTileKey('gsi_relief')}
-              className={`px-2.5 py-1 rounded-md transition cursor-pointer flex items-center gap-1.5 ${
-                currentTileKey === 'gsi_relief' ? 'bg-amber-500 text-stone-950 font-black shadow-xs ring-1 ring-amber-400' : 'text-stone-700 hover:text-stone-950 hover:bg-stone-200/60'
-              }`}
-              title="立体地形・色別標高リアルマップ"
-            >
-              <span>⛰️</span>
-              <span>立体地形</span>
-            </button>
-            <button
-              onClick={() => setCurrentTileKey('gsi_std')}
-              className={`px-2.5 py-1 rounded-md transition cursor-pointer flex items-center gap-1.5 ${
-                currentTileKey === 'gsi_std' ? 'bg-stone-800 text-white font-black shadow-xs ring-1 ring-stone-700' : 'text-stone-700 hover:text-stone-950 hover:bg-stone-200/60'
-              }`}
-              title="国土地理院 標準市街地図"
-            >
-              <span>🗺️</span>
-              <span>市街地図</span>
+              <Maximize2 className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* DEDICATED DISTRICT SELECTOR BAR: All 10 regions wrap cleanly so every single region is 100% visible and clickable */}
-      <div className="shrink-0 bg-stone-50 border-b border-stone-200 px-3 sm:px-4 py-2 z-20">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-[11px] font-black text-stone-600 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
-            <span>各地域を選択（全10エリア・クリックで空き家を表示）:</span>
-          </span>
-          {selectedDistrictKey === 'ALL' && (
-            <span className="text-[11px] font-semibold text-stone-500 hidden md:inline">
-              ※各地域ボタンをクリックすると登録空き家（計79件）のピンが表示されます
-            </span>
-          )}
-        </div>
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs font-bold">
-          {Object.entries(NICHINAN_DISTRICTS).map(([key, d]) => {
-            const isSelected = selectedDistrictKey === key;
-            const count = districtCounts[key] || 0;
-            const icon = DISTRICT_ICONS[key] || '📍';
-            return (
-              <button
-                key={key}
-                onClick={() => handleSelectDistrict(key)}
-                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold ${
-                  isSelected
-                    ? 'bg-emerald-800 text-white font-black shadow-xs ring-2 ring-emerald-600/40'
-                    : 'bg-white hover:bg-amber-50 text-stone-700 hover:text-stone-950 border border-stone-200 shadow-2xs hover:border-amber-300'
-                }`}
-              >
-                <span className="text-sm">{icon}</span>
-                <span>{d.shortName}</span>
-                {key !== 'ALL' && (
-                  <span
-                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
-                      isSelected ? 'bg-amber-400 text-stone-950' : 'bg-stone-100 text-stone-600 border border-stone-200'
+      {/* DEDICATED DISTRICT SELECTOR BAR (Collapsible / Shrinkable on mobile) */}
+      {!isControlsMinimized && (
+        <div className="shrink-0 bg-stone-50 border-b border-stone-200 px-2.5 sm:px-4 py-1.5 sm:py-2 z-20 transition-all">
+          <div className="flex items-center justify-between gap-2 mb-1 sm:mb-1.5">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0"></span>
+              <span className="text-[11px] sm:text-xs font-black text-stone-700 truncate">
+                各地域を選択（全10エリア）:
+              </span>
+              {isDistrictCollapsed && (
+                <span className="text-[10px] text-stone-500 font-medium sm:hidden">
+                  ← 左右スワイプ可 →
+                </span>
+              )}
+              {selectedDistrictKey === 'ALL' && (
+                <span className="text-[11px] font-semibold text-stone-500 hidden xl:inline">
+                  ※各地域ボタンをクリックすると登録空き家（計79件）のピンが表示されます
+                </span>
+              )}
+            </div>
+
+            {/* Shrink / Expand Toggle Button */}
+            <button
+              onClick={() => {
+                const next = !isDistrictCollapsed;
+                setIsDistrictCollapsed(next);
+                if (typeof window !== 'undefined') {
+                  localStorage.setItem('nichinan_district_collapsed', String(next));
+                }
+              }}
+              className={`shrink-0 px-2 sm:px-2.5 py-1 rounded-lg text-[11px] font-extrabold flex items-center gap-1 cursor-pointer transition border shadow-2xs min-h-[30px] active:scale-95 ${
+                isDistrictCollapsed
+                  ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border-emerald-300'
+                  : 'bg-white hover:bg-stone-100 text-stone-700 border-stone-300'
+              }`}
+              title={isDistrictCollapsed ? '全10エリアボタンを展開（全表示）' : 'スマホ向けに1行に縮小（折りたたみ）'}
+            >
+              {isDistrictCollapsed ? (
+                <>
+                  <span className="hidden sm:inline">全エリア</span>
+                  <span>展開</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-emerald-700" />
+                </>
+              ) : (
+                <>
+                  <span>縮小する</span>
+                  <ChevronUp className="w-3.5 h-3.5 text-stone-600" />
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* When Collapsed: Single row horizontal swipeable scroll with all 10 areas */}
+          {isDistrictCollapsed ? (
+            <div className="relative">
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1 px-0.5 text-xs font-bold touch-pan-x -mx-0.5">
+                {Object.entries(NICHINAN_DISTRICTS).map(([key, d]) => {
+                  const isSelected = selectedDistrictKey === key;
+                  const count = districtCounts[key] || 0;
+                  const icon = DISTRICT_ICONS[key] || '📍';
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => handleSelectDistrict(key)}
+                      className={`shrink-0 min-h-[36px] px-2.5 sm:px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold whitespace-nowrap active:scale-95 ${
+                        isSelected
+                          ? 'bg-emerald-800 text-white font-black shadow-xs ring-2 ring-emerald-600/40'
+                          : 'bg-white hover:bg-amber-50 active:bg-amber-100 text-stone-700 hover:text-stone-950 border border-stone-200 shadow-2xs hover:border-amber-300'
+                      }`}
+                    >
+                      <span className="text-sm">{icon}</span>
+                      <span>{d.shortName}</span>
+                      {key !== 'ALL' && (
+                        <span
+                          className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
+                            isSelected ? 'bg-amber-400 text-stone-950' : 'bg-stone-100 text-stone-600 border border-stone-200'
+                          }`}
+                        >
+                          {count}件
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+              {/* Fade scroll indicator on right side */}
+              <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-stone-50 via-stone-50/80 to-transparent sm:hidden flex items-center justify-end pr-0.5">
+                <ChevronRight className="w-3.5 h-3.5 text-stone-400 opacity-60" />
+              </div>
+            </div>
+          ) : (
+            /* When Expanded: Full multi-line wrap showing all 10 areas with touch-friendly spacing */
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs font-bold pt-0.5">
+              {Object.entries(NICHINAN_DISTRICTS).map(([key, d]) => {
+                const isSelected = selectedDistrictKey === key;
+                const count = districtCounts[key] || 0;
+                const icon = DISTRICT_ICONS[key] || '📍';
+                return (
+                  <button
+                    key={key}
+                    onClick={() => handleSelectDistrict(key)}
+                    className={`min-h-[38px] px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold active:scale-95 ${
+                      isSelected
+                        ? 'bg-emerald-800 text-white font-black shadow-xs ring-2 ring-emerald-600/40'
+                        : 'bg-white hover:bg-amber-50 active:bg-amber-100 text-stone-700 hover:text-stone-950 border border-stone-200 shadow-2xs hover:border-amber-300'
                     }`}
                   >
-                    {count}件
-                  </span>
-                )}
-              </button>
-            );
-          })}
+                    <span className="text-base">{icon}</span>
+                    <span>{d.shortName}</span>
+                    {key !== 'ALL' && (
+                      <span
+                        className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
+                          isSelected ? 'bg-amber-400 text-stone-950' : 'bg-stone-100 text-stone-600 border border-stone-200'
+                        }`}
+                      >
+                        {count}件
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
       {/* Edge-to-Edge Interactive Map Area */}
       <div className="relative flex-1 w-full h-full min-h-0 overflow-hidden">
         {/* Real Leaflet Map */}
         <div ref={mapContainerRef} className="w-full h-full" />
 
+        {/* Floating Restore Controls Button (Shown when user minimized controls to maximize map) */}
+        {isControlsMinimized && (
+          <button
+            onClick={() => setIsControlsMinimized(false)}
+            className="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-stone-200 shadow-lg text-xs font-black text-stone-800 flex items-center gap-2 cursor-pointer hover:bg-amber-50 transition"
+            title="地域選択・マップコントロールを再表示"
+          >
+            <span className="text-sm">{DISTRICT_ICONS[selectedDistrictKey] || '🌴'}</span>
+            <span>{NICHINAN_DISTRICTS[selectedDistrictKey]?.shortName}</span>
+            <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full font-black">
+              メニュー展開
+            </span>
+            <ChevronDown className="w-3.5 h-3.5 text-stone-500" />
+          </button>
+        )}
+
         {/* Informative Guide Chip when in Citywide View */}
-        {selectedDistrictKey === 'ALL' && (
-          <div className="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-md px-3.5 py-2.5 rounded-2xl border border-stone-200 shadow-lg text-xs font-bold text-stone-800 flex items-center gap-2.5 max-w-md pointer-events-auto">
-            <span className="text-2xl">🏛️</span>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-stone-900">日南市公式空き家バンク連携中</span>
-                <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 rounded-full text-[10px] font-black">79件取得済</span>
+        {selectedDistrictKey === 'ALL' && !isControlsMinimized && (
+          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-[1000] bg-white/95 backdrop-blur-md px-2.5 py-2 sm:px-3.5 sm:py-2.5 rounded-xl sm:rounded-2xl border border-stone-200 shadow-lg text-xs font-bold text-stone-800 flex items-center gap-2 max-w-[calc(100vw-76px)] sm:max-w-md pointer-events-auto">
+            <span className="text-xl sm:text-2xl shrink-0">🏛️</span>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="font-black text-stone-900 text-xs sm:text-sm">日南市公式空き家バンク</span>
+                <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 rounded-full text-[9px] sm:text-[10px] font-black shrink-0">79件取得済</span>
               </div>
-              <div className="text-[11px] text-stone-600 font-medium leading-tight mt-0.5">
-                日南市空き家・空き地情報バンク（やさしい移住）より全10地区の空き家情報を引込済み。上の地区ボタンから物件を表示できます
+              <div className="text-[10px] sm:text-[11px] text-stone-600 font-medium leading-tight mt-0.5 line-clamp-2 sm:line-clamp-none">
+                全10地区の空き家情報を引込済み。上の地区ボタンから物件を表示できます
               </div>
             </div>
           </div>
@@ -1093,31 +1238,31 @@ export const MapView: React.FC<MapViewProps> = ({
 
         {/* Floating City Info Chip (only shown when a specific district is selected) */}
         {selectedDistrictKey !== 'ALL' && (
-          <div className="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-stone-200 shadow-md text-xs font-black text-stone-800 flex items-center gap-1.5 pointer-events-none">
-            <Sun className="w-3.5 h-3.5 text-amber-500" />
-            <span>{NICHINAN_DISTRICTS[selectedDistrictKey]?.badge}</span>
+          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-[1000] bg-white/95 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-stone-200 shadow-md text-xs font-black text-stone-800 flex items-center gap-1.5 pointer-events-none max-w-[calc(100vw-76px)]">
+            <Sun className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            <span className="truncate">{NICHINAN_DISTRICTS[selectedDistrictKey]?.badge}</span>
           </div>
         )}
 
         {/* Floating Zoom & Control Pad */}
-        <div className="absolute top-3 right-3 z-[1000] flex flex-col gap-1.5 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl border border-stone-200 shadow-lg">
+        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-[1000] flex flex-col gap-1 sm:gap-1.5 bg-white/95 backdrop-blur-md p-1 sm:p-1.5 rounded-xl sm:rounded-2xl border border-stone-200 shadow-lg">
           <button
             onClick={handleZoomIn}
-            className="w-7 h-7 rounded-xl bg-white hover:bg-amber-100 text-stone-800 flex items-center justify-center font-black transition cursor-pointer border border-stone-200 shadow-2xs text-xs"
+            className="w-8 h-8 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl bg-white hover:bg-amber-100 active:bg-amber-200 text-stone-800 flex items-center justify-center font-black transition cursor-pointer border border-stone-200 shadow-2xs text-xs"
             title="拡大"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
           </button>
           <button
             onClick={handleZoomOut}
-            className="w-7 h-7 rounded-xl bg-white hover:bg-amber-100 text-stone-800 flex items-center justify-center font-black transition cursor-pointer border border-stone-200 shadow-2xs text-xs"
+            className="w-8 h-8 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl bg-white hover:bg-amber-100 active:bg-amber-200 text-stone-800 flex items-center justify-center font-black transition cursor-pointer border border-stone-200 shadow-2xs text-xs"
             title="縮小"
           >
-            <Minus className="w-3.5 h-3.5" />
+            <Minus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
           </button>
           <button
             onClick={handleResetBounds}
-            className="w-7 h-7 rounded-xl bg-stone-100 hover:bg-amber-200 text-stone-800 flex items-center justify-center text-[10px] font-black transition cursor-pointer border border-stone-200"
+            className="w-8 h-8 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl bg-stone-100 hover:bg-amber-200 active:bg-amber-300 text-stone-800 flex items-center justify-center text-[10px] font-black transition cursor-pointer border border-stone-200"
             title="日南市全域に戻す"
           >
             全域
@@ -1126,13 +1271,13 @@ export const MapView: React.FC<MapViewProps> = ({
 
         {/* Floating Bottom Location Pins Scroller (only shown when a specific district is selected and has properties) */}
         {selectedDistrictKey !== 'ALL' && positionedProperties.length > 0 && (
-          <div className="absolute bottom-3 left-3 right-3 z-[1000] bg-white/95 backdrop-blur-md p-2 rounded-2xl border border-stone-200 shadow-lg flex items-center gap-2">
+          <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 z-[1000] bg-white/95 backdrop-blur-md p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-stone-200 shadow-lg flex items-center gap-1.5 sm:gap-2">
             <span className="shrink-0 text-xs font-black text-stone-800 flex items-center gap-1 px-1">
               <MapPin className="w-3.5 h-3.5 text-emerald-700" />
               <span className="hidden sm:inline">地区内空き家</span>
-              <span className="text-[10px] text-stone-500">({positionedProperties.length}件)</span>
+              <span className="text-[10px] text-stone-500 font-bold">({positionedProperties.length}件)</span>
             </span>
-            <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+            <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
               {positionedProperties.map(item => {
                 const isSelected = activeProperty?.id === item.property.id;
                 return (
@@ -1149,10 +1294,10 @@ export const MapView: React.FC<MapViewProps> = ({
                         );
                       }
                     }}
-                    className={`shrink-0 px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border ${
+                    className={`shrink-0 min-h-[34px] px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border active:scale-95 ${
                       isSelected
                         ? 'bg-amber-400 text-stone-950 border-amber-500 shadow-xs font-black scale-105'
-                        : 'bg-stone-50 hover:bg-amber-50 text-stone-700 border-stone-200'
+                        : 'bg-stone-50 hover:bg-amber-50 active:bg-amber-100 text-stone-700 border-stone-200'
                     }`}
                   >
                     <span
@@ -1173,19 +1318,19 @@ export const MapView: React.FC<MapViewProps> = ({
 
         {/* FLOATING PROPERTY DETAIL CARD (Slides up when a pin is selected in a district, suppressed when full details are open) */}
         {selectedDistrictKey !== 'ALL' && activeProperty && !isDetailOpen && (
-          <div className="absolute bottom-16 right-3 z-[1010] w-[calc(100vw-24px)] sm:w-96 bg-white/98 backdrop-blur-md rounded-2xl border border-emerald-300/80 shadow-2xl p-4 space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-200">
+          <div className="absolute bottom-2 sm:bottom-16 left-2 right-2 sm:left-auto sm:right-3 z-[1010] w-[calc(100vw-16px)] sm:w-96 max-h-[75vh] overflow-y-auto bg-white/98 backdrop-blur-md rounded-2xl border border-emerald-300/80 shadow-2xl p-3 sm:p-4 space-y-2.5 sm:space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-200">
             {/* Close Button */}
             <button
               onClick={() => setActiveProperty(null)}
-              className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center cursor-pointer transition shadow-2xs z-10"
+              className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-600 flex items-center justify-center cursor-pointer transition shadow-2xs z-10 active:scale-90"
               title="閉じる"
             >
               <X className="w-4 h-4" />
             </button>
 
             {/* Quick Property View */}
-            <div className="flex gap-3">
-              <div className="w-24 h-24 rounded-xl overflow-hidden bg-stone-100 shrink-0 border border-stone-200">
+            <div className="flex gap-2.5 sm:gap-3">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-stone-100 shrink-0 border border-stone-200">
                 {activeProperty.images && activeProperty.images.length > 0 ? (
                   <img
                     src={activeProperty.images[0]}
@@ -1213,15 +1358,15 @@ export const MapView: React.FC<MapViewProps> = ({
                   <MapPin className="w-3 h-3 text-amber-600 shrink-0" />
                   {activeProperty.address}
                 </span>
-                <h4 className="font-extrabold text-stone-900 text-xs sm:text-sm leading-tight truncate mb-1.5">
+                <h4 className="font-extrabold text-stone-900 text-xs sm:text-sm leading-tight truncate mb-1">
                   {activeProperty.title}
                 </h4>
-                <div className="flex items-center gap-1 text-xs">
+                <div className="flex items-center gap-1.5 text-xs">
                   <span className="px-2 py-0.5 bg-amber-400 text-stone-950 font-black rounded-md text-[11px]">
                     {activeProperty.price === 0 ? '0円譲渡' : `${(activeProperty.price / 10000).toLocaleString()}万円`}
                   </span>
-                  <span className="text-[10px] text-stone-500 font-bold truncate">
-                    {activeProperty.layout} • 延床{activeProperty.buildingArea}㎡
+                  <span className="text-[10px] sm:text-[11px] text-stone-500 font-bold truncate">
+                    {activeProperty.layout} • {activeProperty.buildingArea}㎡
                   </span>
                 </div>
               </div>
@@ -1229,8 +1374,8 @@ export const MapView: React.FC<MapViewProps> = ({
 
             {/* Condition & Tags */}
             <div className="flex items-center justify-between text-[11px] bg-stone-50 p-2 rounded-xl border border-stone-200">
-              <span className="font-medium text-stone-600">状態: {activeProperty.conditionText}</span>
-              <span className="font-bold text-emerald-700">{activeProperty.tags[0] ? `#${activeProperty.tags[0]}` : ''}</span>
+              <span className="font-medium text-stone-600 truncate">状態: {activeProperty.conditionText}</span>
+              <span className="font-bold text-emerald-700 shrink-0 ml-1">{activeProperty.tags[0] ? `#${activeProperty.tags[0]}` : ''}</span>
             </div>
 
             {/* Google Maps 3D & Street View External Link for Real Local Check */}
@@ -1238,28 +1383,28 @@ export const MapView: React.FC<MapViewProps> = ({
               href={`https://www.google.com/maps/search/?api=1&query=${activeProperty.lat},${activeProperty.lng}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-1.5 px-2.5 bg-sky-50 hover:bg-sky-100 text-sky-900 font-bold text-[11px] rounded-xl border border-sky-200 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+              className="w-full py-2 px-2.5 bg-sky-50 hover:bg-sky-100 active:bg-sky-200 text-sky-900 font-bold text-[11px] rounded-xl border border-sky-200 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
               title="Google Mapsでリアルな現地の3D航空写真・ストリートビューを表示"
             >
               <ExternalLink className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-              <span>Google 3D・ストリートビューで現地のリアルな街並みを確認</span>
+              <span className="truncate">Google 3D・ストリートビューで現地の街並みを確認</span>
             </a>
 
             {/* Actions */}
             <div className="flex items-center gap-2 pt-0.5">
               <button
                 onClick={() => onSelectProperty(activeProperty)}
-                className="flex-1 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1 cursor-pointer"
+                className="flex-1 min-h-[42px] py-2 bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-xs transition flex items-center justify-center gap-1 cursor-pointer active:scale-98"
               >
                 <span>物件詳細・補助金を見る</span>
-                <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => onToggleFavorite(activeProperty.id)}
-                className={`p-2 rounded-xl border transition cursor-pointer ${
+                className={`min-h-[42px] min-w-[42px] p-2.5 rounded-xl border transition cursor-pointer flex items-center justify-center active:scale-95 ${
                   isFavorite(activeProperty.id)
                     ? 'bg-rose-50 text-rose-600 border-rose-200'
-                    : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
+                    : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50 active:bg-stone-100'
                 }`}
                 title="お気に入り"
               >

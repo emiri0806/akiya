@@ -48,7 +48,7 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-stone-100 text-stone-900 font-sans overflow-hidden antialiased selection:bg-amber-300">
+    <div className="h-[100dvh] min-h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] flex flex-col bg-stone-100 text-stone-900 font-sans overflow-hidden antialiased selection:bg-amber-300">
       {/* Minimal Clean Header */}
       <Navbar
         favoriteCount={favorites.length}
@@ -57,8 +57,8 @@ export default function App() {
         lastSyncTime={lastSyncTime}
       />
 
-      {/* Main Full-Screen Map Container (Nichinan City Map Only) */}
-      <main className="flex-1 w-full h-[calc(100vh-56px)] relative overflow-hidden p-2 sm:p-3">
+      {/* Main Full-Screen Map Container (Nichinan City Map Only - edge to edge on mobile) */}
+      <main className="flex-1 min-h-0 w-full relative overflow-hidden p-0 sm:p-2 md:p-3">
         <div className={`w-full h-full ${selectedProperty ? 'hidden pointer-events-none' : 'block'}`}>
           <MapView
             properties={properties}

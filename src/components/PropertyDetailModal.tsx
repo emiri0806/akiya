@@ -118,45 +118,46 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   const hasImages = property.images && property.images.length > 0;
 
   return (
-    <div id="property-detail-modal" className="fixed inset-0 z-[99999] bg-stone-100 flex flex-col overflow-hidden animate-fadeIn select-text">
+    <div id="property-detail-modal" className="fixed inset-0 z-[99999] bg-stone-100 flex flex-col h-[100dvh] max-h-[100dvh] overflow-hidden animate-fadeIn select-text">
       {/* Top Navigation Bar: Easy Return to Map */}
-      <div className="px-3 sm:px-6 py-3 border-b border-stone-200 flex items-center justify-between bg-white shadow-xs sticky top-0 z-30 shrink-0">
-        <div className="flex items-center gap-2 sm:gap-3">
+      <div className="px-2.5 sm:px-6 py-2 sm:py-3 border-b border-stone-200 flex items-center justify-between bg-white shadow-xs sticky top-0 z-30 shrink-0 h-13 sm:h-14">
+        <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
           <button
             onClick={onClose}
-            className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 active:scale-95 text-white font-extrabold text-xs sm:text-sm transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+            className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-stone-900 hover:bg-stone-800 active:scale-95 text-white font-extrabold text-xs sm:text-sm transition flex items-center gap-1 sm:gap-1.5 shadow-sm cursor-pointer shrink-0 min-h-[36px]"
             title="地図画面に戻る"
           >
             <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300" />
-            <span>← 地図に戻る</span>
+            <span className="sm:hidden">地図</span>
+            <span className="hidden sm:inline">← 地図に戻る</span>
           </button>
 
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200">
-              物件No. {property.id.toUpperCase()}
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <span className="px-2 sm:px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] sm:text-xs font-bold border border-emerald-200 shrink-0">
+              No.{property.id.replace('ak-', '')}
             </span>
-            <span className="text-xs text-stone-500 font-bold hidden sm:inline-block max-w-sm truncate">
+            <span className="text-xs text-stone-600 font-bold truncate max-w-[150px] xs:max-w-xs sm:max-w-sm">
               {property.title}
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button
             onClick={() => onToggleFavorite(property.id)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition border cursor-pointer ${
+            className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition border cursor-pointer min-h-[36px] active:scale-95 ${
               isFavorite
                 ? 'bg-rose-50 border-rose-200 text-rose-600'
                 : 'bg-white border-stone-200 text-stone-700 hover:bg-stone-50'
             }`}
           >
-            <Heart className={`w-4 h-4 ${isFavorite ? 'text-rose-500 fill-rose-500' : ''}`} />
-            <span>{isFavorite ? 'キープ中' : 'キープ保存'}</span>
+            <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isFavorite ? 'text-rose-500 fill-rose-500' : ''}`} />
+            <span className="hidden xs:inline">{isFavorite ? 'キープ中' : '保存'}</span>
           </button>
 
           <button
             onClick={onClose}
-            className="p-2 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-full transition cursor-pointer"
+            className="p-1.5 sm:p-2 text-stone-400 hover:text-stone-700 hover:bg-stone-100 active:bg-stone-200 rounded-full transition cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
             title="閉じる"
           >
             <X className="w-5 h-5" />
@@ -165,40 +166,40 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
       </div>
 
       {/* Main Full-Page Scrollable Content */}
-      <div className="flex-1 overflow-y-auto bg-stone-100 p-2 sm:p-5 md:p-7">
-        <div className="max-w-5xl mx-auto bg-white rounded-3xl p-4 sm:p-7 md:p-8 shadow-sm border border-stone-200 space-y-6">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain bg-stone-100 p-2 sm:p-5 md:p-7">
+        <div className="max-w-5xl mx-auto bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-7 md:p-8 shadow-sm border border-stone-200 space-y-4 sm:space-y-6">
           {/* Main Title & Price Row */}
-          <div className="mb-6 flex flex-col md:flex-row md:items-start justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex flex-wrap items-center gap-2 mb-2">
-                <div className="flex items-center gap-1.5 text-emerald-800 font-bold text-sm">
-                  <MapPin className="w-4 h-4 text-emerald-700 shrink-0" />
+          <div className="mb-4 sm:mb-6 flex flex-col md:flex-row md:items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
+                <div className="flex items-center gap-1 sm:gap-1.5 text-emerald-800 font-bold text-xs sm:text-sm">
+                  <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 shrink-0" />
                   <span>{property.address}</span>
                 </div>
-                <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 text-xs font-semibold">
+                <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 text-[10px] sm:text-xs font-semibold">
                   {property.structure.split('（')[0]}
                 </span>
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${property.coordinates?.lat || property.lat || 31.6289},${property.coordinates?.lng || property.lng || 131.3542}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-800 text-[11px] font-bold border border-sky-200 transition shadow-2xs"
+                  className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-800 text-[10px] sm:text-[11px] font-bold border border-sky-200 transition shadow-2xs"
                   title="Google Mapsでリアルな現地の3D航空写真・ストリートビューを表示"
                 >
-                  <ExternalLink className="w-3 h-3 text-sky-600" />
-                  <span>Google 3D・現地ストリートビュー</span>
+                  <ExternalLink className="w-3 h-3 text-sky-600 shrink-0" />
+                  <span>Google 3D・ストリートビュー</span>
                 </a>
               </div>
 
-              <h1 className="text-xl sm:text-2xl font-black text-stone-900 leading-tight mb-3">
+              <h1 className="text-lg sm:text-2xl font-black text-stone-900 leading-snug sm:leading-tight mb-3">
                 {property.title}
               </h1>
 
               {/* Price & Financial Overview Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                <div className="bg-stone-900 text-white p-3 rounded-xl border border-stone-800">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+                <div className="bg-stone-900 text-white p-2.5 sm:p-3 rounded-xl border border-stone-800">
                   <span className="text-[10px] text-stone-400 font-bold block">物件価格 / 譲渡金</span>
-                  <div className="text-lg sm:text-xl font-black text-amber-300 mt-0.5 truncate">
+                  <div className="text-base sm:text-xl font-black text-amber-300 mt-0.5 truncate">
                     {property.price === 0
                       ? '0円（無償譲渡）'
                       : property.bankTransactionType === '賃貸'
@@ -208,25 +209,25 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   <span className="text-[10px] text-stone-400 block mt-0.5">{property.bankTransactionType || '売買'}</span>
                 </div>
 
-                <div className="bg-stone-50 p-3 rounded-xl border border-stone-200">
+                <div className="bg-stone-50 p-2.5 sm:p-3 rounded-xl border border-stone-200">
                   <span className="text-[10px] text-stone-500 font-bold block">推定リフォーム概算</span>
-                  <div className="text-base sm:text-lg font-black text-stone-900 mt-0.5">
+                  <div className="text-sm sm:text-lg font-black text-stone-900 mt-0.5 truncate">
                     約 {(property.estimatedRenovationCost / 10000).toLocaleString()} 万円
                   </div>
                   <span className="text-[10px] text-stone-500 block mt-0.5">水回り・外壁点検等</span>
                 </div>
 
-                <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+                <div className="bg-emerald-50 p-2.5 sm:p-3 rounded-xl border border-emerald-200">
                   <span className="text-[10px] text-emerald-800 font-bold block">日南市移住改修補助金</span>
-                  <div className="text-base sm:text-lg font-black text-emerald-900 mt-0.5">
+                  <div className="text-sm sm:text-lg font-black text-emerald-900 mt-0.5 truncate">
                     最大 {Math.round(property.availableSubsidy / 10000)} 万円
                   </div>
                   <span className="text-[10px] text-emerald-700 block mt-0.5">空き家バンク交付対象</span>
                 </div>
 
-                <div className="bg-amber-50 p-3 rounded-xl border border-amber-200">
+                <div className="bg-amber-50 p-2.5 sm:p-3 rounded-xl border border-amber-200">
                   <span className="text-[10px] text-amber-900 font-bold block">実質自己負担目安</span>
-                  <div className="text-base sm:text-lg font-black text-amber-950 mt-0.5">
+                  <div className="text-sm sm:text-lg font-black text-amber-950 mt-0.5 truncate">
                     約 {Math.max(0, Math.round((property.price + property.estimatedRenovationCost - property.availableSubsidy) / 10000)).toLocaleString()} 万円
                   </div>
                   <span className="text-[10px] text-amber-800 block mt-0.5">※ 補助金適用後試算</span>
@@ -235,7 +236,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
             </div>
 
             {/* Official Akiya Bank Registration Widget */}
-            <div className="bg-gradient-to-br from-stone-900 to-emerald-950 text-white p-4 rounded-2xl shrink-0 min-w-[240px] shadow-sm flex flex-col justify-center border border-emerald-900/40">
+            <div className="bg-gradient-to-br from-stone-900 to-emerald-950 text-white p-3.5 sm:p-4 rounded-xl sm:rounded-2xl shrink-0 w-full md:w-auto md:min-w-[250px] shadow-sm flex flex-col justify-center border border-emerald-900/40">
               <div className="flex items-center justify-between text-stone-300 text-xs font-semibold pb-1.5 border-b border-stone-800">
                 <span className="flex items-center gap-1">
                   <Building className="w-3.5 h-3.5 text-amber-400" />
@@ -245,11 +246,11 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   {property.bankTransactionType || (property.price === 0 ? '0円譲渡' : '売買')}
                 </span>
               </div>
-              <div className="text-base font-bold text-amber-300 flex items-center gap-1.5 mt-2 truncate">
+              <div className="text-sm sm:text-base font-bold text-amber-300 flex items-center gap-1.5 mt-2 truncate">
                 <span>{property.registrationNumber || '日南市登録 第24-01号'}</span>
               </div>
               <div className="text-[11px] text-emerald-300 font-medium mt-1 flex items-center gap-1">
-                <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+                <CheckCircle className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
                 <span>移住者優先枠・現地内見受付中</span>
               </div>
               {property.officialBankUrl && (
@@ -257,10 +258,10 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   href={property.officialBankUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2.5 py-1.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs cursor-pointer"
+                  className="mt-2.5 py-2 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs cursor-pointer min-h-[38px] active:scale-95"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
-                  <span>空き家バンク公式ページで確認</span>
+                  <span>公式空き家バンクで確認</span>
                 </a>
               )}
               <div className="mt-2.5 pt-2 border-t border-stone-800 flex items-center justify-between">
@@ -271,7 +272,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           </div>
 
           {/* Photos Gallery with Caption Overlays & Thumbnails */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             {hasImages ? (
               <div className="space-y-3">
                 {/* Main Hero Photo Viewer */}
@@ -365,42 +366,45 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
             )}
           </div>
 
-          {/* Navigation Tabs inside Modal */}
-          <div className="flex border-b border-stone-200 mb-6 font-semibold text-sm">
+          {/* Navigation Tabs inside Modal (Smooth horizontal scroll on mobile) */}
+          <div className="flex border-b border-stone-200 mb-4 sm:mb-6 font-semibold text-xs sm:text-sm overflow-x-auto scrollbar-none gap-1 sm:gap-2 touch-pan-x -mx-1 px-1">
             <button
               onClick={() => setActiveTab('details')}
-              className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition cursor-pointer ${
+              className={`pb-2.5 sm:pb-3 px-3 sm:px-4 flex items-center gap-1.5 sm:gap-2 border-b-2 transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 min-h-[38px] ${
                 activeTab === 'details'
                   ? 'border-emerald-800 text-emerald-900 font-bold'
                   : 'border-transparent text-stone-500 hover:text-stone-800'
               }`}
             >
-              <Info className="w-4 h-4" />
-              <span>物件詳細・現況スペック</span>
+              <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700" />
+              <span className="sm:hidden">物件詳細・現況</span>
+              <span className="hidden sm:inline">物件詳細・現況スペック</span>
             </button>
 
             <button
               onClick={() => setActiveTab('renovation')}
-              className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition cursor-pointer ${
+              className={`pb-2.5 sm:pb-3 px-3 sm:px-4 flex items-center gap-1.5 sm:gap-2 border-b-2 transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 min-h-[38px] ${
                 activeTab === 'renovation'
                   ? 'border-emerald-800 text-emerald-900 font-bold'
                   : 'border-transparent text-stone-500 hover:text-stone-800'
               }`}
             >
-              <Hammer className="w-4 h-4 text-amber-600" />
-              <span>リフォーム・DIY改修プラン検討</span>
+              <Hammer className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
+              <span className="sm:hidden">リフォーム・DIY試算</span>
+              <span className="hidden sm:inline">リフォーム・DIY改修プラン検討</span>
             </button>
 
             <button
               onClick={() => setActiveTab('inquiry')}
-              className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition cursor-pointer ${
+              className={`pb-2.5 sm:pb-3 px-3 sm:px-4 flex items-center gap-1.5 sm:gap-2 border-b-2 transition cursor-pointer shrink-0 whitespace-nowrap active:scale-95 min-h-[38px] ${
                 activeTab === 'inquiry'
                   ? 'border-emerald-800 text-emerald-900 font-bold'
                   : 'border-transparent text-stone-500 hover:text-stone-800'
               }`}
             >
-              <Send className="w-4 h-4 text-emerald-700" />
-              <span>内見予約・創客創人センター問合せ</span>
+              <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700" />
+              <span className="sm:hidden">内見予約・相談窓口</span>
+              <span className="hidden sm:inline">内見予約・創客創人センター問合せ</span>
             </button>
           </div>
 
@@ -943,29 +947,33 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
             </div>
           )}
         </div>
+      </div>
 
-        {/* Modal Bottom CTA Footer with Return to Map Button */}
-        <div className="px-4 sm:px-6 py-3.5 bg-white border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm shrink-0">
-          <div className="text-xs text-stone-600 hidden sm:block">
-            <span className="font-bold text-stone-900">担当窓口:</span> 創客創人センター（日南市 移住定住・空き家バンク支援窓口 / 油津商店街 ittenほりかわ内）
-          </div>
+      {/* Modal Bottom Persistent CTA Footer with Return to Map Button */}
+      <div className="px-3 sm:px-6 py-2.5 sm:py-3 bg-white border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 shadow-md shrink-0 z-30">
+        <div className="text-xs text-stone-600 hidden sm:block">
+          <span className="font-bold text-stone-900">担当窓口:</span> 創客創人センター（日南市 移住定住・空き家バンク支援窓口 / 油津商店街 ittenほりかわ内）
+        </div>
 
-          <div className="flex items-center gap-2.5 w-full sm:w-auto">
-            <button
-              onClick={onClose}
-              className="px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold rounded-xl border border-stone-300 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
-            >
-              <ChevronLeft className="w-4 h-4 text-stone-600" />
-              <span>地図に戻る</span>
-            </button>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={onClose}
+            className="px-3.5 sm:px-4 py-2 sm:py-2.5 bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-800 text-xs font-bold rounded-xl border border-stone-300 transition flex items-center justify-center gap-1 cursor-pointer shadow-2xs min-h-[40px] active:scale-95 shrink-0"
+          >
+            <ChevronLeft className="w-4 h-4 text-stone-600" />
+            <span>地図に戻る</span>
+          </button>
 
-            <button
-              onClick={() => setActiveTab('inquiry')}
-              className="flex-1 sm:flex-none px-6 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-extrabold rounded-xl shadow-xs transition cursor-pointer"
-            >
-              内見予約・窓口相談をする
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              setActiveTab('inquiry');
+              const container = document.querySelector('#property-detail-modal .overflow-y-auto');
+              container?.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            }}
+            className="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-2.5 bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 text-white text-xs sm:text-sm font-extrabold rounded-xl shadow-xs transition cursor-pointer min-h-[40px] active:scale-98 text-center"
+          >
+            内見予約・窓口相談をする
+          </button>
         </div>
       </div>
     </div>
